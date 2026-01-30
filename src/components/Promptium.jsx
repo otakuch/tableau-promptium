@@ -376,43 +376,42 @@ export default function Promptium() {
         </div>
 
         {/* Example Assembly */}
-        {!isMobile && (
-          <div style={{
-            background: theme.bgSecondary, borderRadius: '12px', padding: '20px 24px',
-            marginBottom: '24px', border: `1px solid ${theme.border}`,
-          }}>
-            <h3 style={{ color: theme.text, fontSize: '0.9rem', fontWeight: '600', marginBottom: '14px', textAlign: 'center' }}>
-              {t('exampleTitle')}
-            </h3>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '16px' }}>
-              {exampleElements.map((el, index) => (
-                <React.Fragment key={el.id}>
-                  <div style={{
-                    width: '44px', height: '44px', background: 'transparent',
-                    border: `2px solid ${el.color}`, borderRadius: '6px',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <span style={{ fontSize: '0.55rem', color: el.color, opacity: 0.7 }}>{el.id}</span>
-                    <span style={{ fontSize: '1rem', fontWeight: '700', color: el.color }}>{el.symbol}</span>
-                  </div>
-                  {index < exampleElements.length - 1 && <span style={{ color: theme.textMuted, fontSize: '1rem' }}>+</span>}
-                </React.Fragment>
-              ))}
-            </div>
-            <div style={{
-              background: theme.codeBg, borderRadius: '8px', padding: '12px 16px',
-              fontFamily: '"JetBrains Mono", monospace', fontSize: '0.8rem',
-              color: theme.codeText, lineHeight: 1.6,
-            }}>
-              <span style={{ color: categories.context.color }}>[Ro]</span> {t('exampleRo')}{' '}
-              <span style={{ color: categories.context.color }}>[Ob]</span> {t('exampleOb')}{' '}
-              <span style={{ color: categories.operators.color }}>[Sy]</span> {t('exampleSy')}{' '}
-              <span style={{ color: categories.reasoning.color }}>[CoT]</span> {t('exampleCoT')}{' '}
-              <span style={{ color: categories.constraints.color }}>[Li]</span> {t('exampleLi')}{' '}
-              <span style={{ color: categories.governance.color }}>[Ha]</span> {t('exampleHa')}
-            </div>
+        <div style={{
+          background: theme.bgSecondary, borderRadius: '12px',
+          padding: isMobile ? '14px' : '20px 24px',
+          marginBottom: isMobile ? '16px' : '24px', border: `1px solid ${theme.border}`,
+        }}>
+          <h3 style={{ color: theme.text, fontSize: isMobile ? '0.8rem' : '0.9rem', fontWeight: '600', marginBottom: isMobile ? '10px' : '14px', textAlign: 'center' }}>
+            {t('exampleTitle')}
+          </h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '4px' : '6px', flexWrap: 'wrap', marginBottom: isMobile ? '12px' : '16px' }}>
+            {exampleElements.map((el, index) => (
+              <React.Fragment key={el.id}>
+                <div style={{
+                  width: isMobile ? '36px' : '44px', height: isMobile ? '36px' : '44px', background: 'transparent',
+                  border: `2px solid ${el.color}`, borderRadius: '6px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <span style={{ fontSize: isMobile ? '0.45rem' : '0.55rem', color: el.color, opacity: 0.7 }}>{el.id}</span>
+                  <span style={{ fontSize: isMobile ? '0.8rem' : '1rem', fontWeight: '700', color: el.color }}>{el.symbol}</span>
+                </div>
+                {index < exampleElements.length - 1 && <span style={{ color: theme.textMuted, fontSize: isMobile ? '0.8rem' : '1rem' }}>+</span>}
+              </React.Fragment>
+            ))}
           </div>
-        )}
+          <div style={{
+            background: theme.codeBg, borderRadius: '8px', padding: isMobile ? '10px 12px' : '12px 16px',
+            fontFamily: '"JetBrains Mono", monospace', fontSize: isMobile ? '0.68rem' : '0.8rem',
+            color: theme.codeText, lineHeight: 1.6,
+          }}>
+            <span style={{ color: categories.context.color }}>[Ro]</span> {t('exampleRo')}{' '}
+            <span style={{ color: categories.context.color }}>[Ob]</span> {t('exampleOb')}{' '}
+            <span style={{ color: categories.operators.color }}>[Sy]</span> {t('exampleSy')}{' '}
+            <span style={{ color: categories.reasoning.color }}>[CoT]</span> {t('exampleCoT')}{' '}
+            <span style={{ color: categories.constraints.color }}>[Li]</span> {t('exampleLi')}{' '}
+            <span style={{ color: categories.governance.color }}>[Ha]</span> {t('exampleHa')}
+          </div>
+        </div>
 
         {/* Category filters */}
         <div style={{
