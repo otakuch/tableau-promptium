@@ -433,13 +433,13 @@ export default function Promptium() {
           display: 'flex',
           justifyContent: 'center',
           marginBottom: '24px',
+          overflowX: 'auto',
         }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+            gridTemplateColumns: isMobile ? `repeat(${cols}, 1fr)` : `repeat(${cols}, 55px)`,
             gap: isMobile ? '3px' : '4px',
-            width: '100%',
-            maxWidth: isMobile ? '100%' : '1200px',
+            width: isMobile ? '100%' : 'auto',
           }}>
           {gridLayout.flat().map((id, index) => {
             if (!id) {
