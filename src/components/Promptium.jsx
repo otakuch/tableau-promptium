@@ -430,12 +430,17 @@ export default function Promptium() {
 
         {/* Periodic Table Grid - Full width responsive */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gap: isMobile ? '3px' : '4px',
+          display: 'flex',
+          justifyContent: 'center',
           marginBottom: '24px',
-          width: '100%',
         }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+            gap: isMobile ? '3px' : '4px',
+            width: '100%',
+            maxWidth: isMobile ? '100%' : '1200px',
+          }}>
           {gridLayout.flat().map((id, index) => {
             if (!id) {
               return <div key={`empty-${index}`} style={{ aspectRatio: '1', minHeight: 0 }} />;
@@ -496,6 +501,7 @@ export default function Promptium() {
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* Legend */}
