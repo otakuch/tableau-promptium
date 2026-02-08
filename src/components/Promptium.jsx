@@ -145,7 +145,7 @@ const gridLayoutMobile = [
 const texts = {
   subtitle: { FR: 'Tableau periodique du prompt engineering', EN: 'Periodic table of prompt engineering' },
   version: { FR: 'Version 1.0 - Janvier 2026 | Concu par Naully Nicolas', EN: 'Version 1.0 - January 2026 | Designed by Naully Nicolas' },
-  lab: { FR: 'Laboratoire de Prompt (bientot)', EN: 'Prompt Laboratory (coming soon)' },
+  lab: { FR: 'Laboratoire', EN: 'Laboratory' },
   lightMode: { FR: 'Mode Clair', EN: 'Light Mode' },
   darkMode: { FR: 'Mode Sombre', EN: 'Dark Mode' },
   all: { FR: 'Tous', EN: 'All' },
@@ -177,6 +177,20 @@ const texts = {
   },
   fullExampleCopy: { FR: 'Copier le prompt', EN: 'Copy prompt' },
   fullExampleCopied: { FR: 'Prompt copie !', EN: 'Prompt copied!' },
+  // Lab translations
+  labIntroTitle: { FR: 'Bienvenue au Laboratoire', EN: 'Welcome to the Laboratory' },
+  labIntroText: {
+    FR: "Composez vos prompts comme un chimiste cree des formules.\n\nComment ca marche :\n1. Glissez les elements depuis le tableau vers la zone de reaction\n2. Organisez-les dans l'ordre souhaite\n3. Votre prompt se genere automatiquement\n4. Copiez et utilisez !\n\nAstuce : Combinez des elements de differentes familles pour des prompts plus puissants.",
+    EN: "Compose your prompts like a chemist creates formulas.\n\nHow it works:\n1. Drag elements from the table to the reaction zone\n2. Arrange them in your desired order\n3. Your prompt is generated automatically\n4. Copy and use!\n\nTip: Combine elements from different families for more powerful prompts."
+  },
+  labStart: { FR: "Commencer l'experience", EN: 'Start the experiment' },
+  labTitle: { FR: 'Laboratoire de Prompt', EN: 'Prompt Laboratory' },
+  labDropZone: { FR: 'Glissez les elements ici', EN: 'Drag elements here' },
+  labFormula: { FR: 'Formule generee', EN: 'Generated formula' },
+  labReset: { FR: 'Reinitialiser', EN: 'Reset' },
+  labCopy: { FR: 'Copier le prompt', EN: 'Copy prompt' },
+  labCopied: { FR: 'Copie !', EN: 'Copied!' },
+  labEmpty: { FR: 'Ajoutez des elements pour generer votre prompt...', EN: 'Add elements to generate your prompt...' },
 };
 
 export default function Promptium() {
@@ -186,6 +200,12 @@ export default function Promptium() {
   const [darkMode, setDarkMode] = useState(false);
   const [lang, setLang] = useState('FR');
   const [isMobile, setIsMobile] = useState(false);
+  // Lab states
+  const [showLabIntro, setShowLabIntro] = useState(false);
+  const [showLab, setShowLab] = useState(false);
+  const [labElements, setLabElements] = useState([]);
+  const [labCopied, setLabCopied] = useState(false);
+  const [draggedElement, setDraggedElement] = useState(null);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 900);
@@ -201,6 +221,53 @@ export default function Promptium() {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Lab functions
+  const handleLabDragStart = (e, element) => {
+    setDraggedElement(element);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
+  const handleLabDrop = (e) => {
+    e.preventDefault();
+    if (draggedElement) {
+      setLabElements(prev => [...prev, { ...draggedElement, uid: Date.now() + Math.random() }]);
+      setDraggedElement(null);
+    }
+  };
+
+  const handleLabDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const removeLabElement = (uid) => {
+    setLabElements(prev => prev.filter(el => el.uid !== uid));
+  };
+
+  const resetLab = () => {
+    setLabElements([]);
+  };
+
+  const copyLabPrompt = () => {
+    const prompt = labElements.map(el => lang === 'FR' ? el.templateFR : el.templateEN).join('\n\n');
+    navigator.clipboard.writeText(prompt);
+    setLabCopied(true);
+    setTimeout(() => setLabCopied(false), 2000);
+  };
+
+  const openLab = () => {
+    setShowLabIntro(true);
+  };
+
+  const startLab = () => {
+    setShowLabIntro(false);
+    setShowLab(true);
+  };
+
+  const closeLab = () => {
+    setShowLab(false);
   };
 
   const theme = {
@@ -370,10 +437,10 @@ export default function Promptium() {
           }}>
             {lang === 'FR' ? 'FR' : 'EN'}
           </button>
-          <button style={{
+          <button onClick={openLab} style={{
             padding: '6px 14px', borderRadius: '16px', border: `1px solid ${theme.border}`,
-            background: theme.bgSecondary, color: theme.textMuted, cursor: 'not-allowed', fontSize: '0.8rem', opacity: 0.5,
-          }} disabled>
+            background: 'linear-gradient(135deg, #F97316, #EC4899)', color: '#FFF', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '500',
+          }}>
             {t('lab')}
           </button>
           <button onClick={() => setDarkMode(!darkMode)} style={{
@@ -698,6 +765,222 @@ export default function Promptium() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lab Intro Popup */}
+      {showLabIntro && (
+        <div style={{
+          position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 200, padding: '20px', background: 'rgba(0,0,0,0.7)',
+        }} onClick={() => setShowLabIntro(false)}>
+          <div style={{
+            background: theme.bgSecondary, borderRadius: '20px', padding: '32px',
+            maxWidth: '500px', width: '100%', textAlign: 'center',
+            border: '2px solid transparent',
+            backgroundImage: `linear-gradient(${theme.bgSecondary}, ${theme.bgSecondary}), linear-gradient(135deg, #F97316, #EC4899)`,
+            backgroundOrigin: 'border-box',
+            backgroundClip: 'padding-box, border-box',
+            animation: 'modalIn 0.3s ease',
+          }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>&#9883;</div>
+            <h2 style={{ color: theme.text, fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px' }}>
+              {t('labIntroTitle')}
+            </h2>
+            <p style={{
+              color: theme.textMuted, fontSize: '0.9rem', lineHeight: 1.8,
+              whiteSpace: 'pre-line', textAlign: 'left', marginBottom: '24px',
+            }}>
+              {t('labIntroText')}
+            </p>
+            <button onClick={startLab} style={{
+              background: 'linear-gradient(135deg, #F97316, #EC4899)',
+              border: 'none', borderRadius: '12px', padding: '14px 32px',
+              color: '#FFF', fontSize: '1rem', fontWeight: '600', cursor: 'pointer',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(249, 115, 22, 0.4)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>
+              {t('labStart')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Lab Modal */}
+      {showLab && (
+        <div style={{
+          position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
+          zIndex: 200, background: theme.bg, overflow: 'hidden',
+        }}>
+          {/* Lab Header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '16px 24px', borderBottom: `1px solid ${theme.border}`,
+            background: theme.bgSecondary,
+          }}>
+            <h2 style={{
+              fontSize: '1.2rem', fontWeight: '700',
+              background: 'linear-gradient(135deg, #F97316, #EC4899)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
+              {t('labTitle')}
+            </h2>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => setLang(lang === 'FR' ? 'EN' : 'FR')} style={{
+                padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.border}`,
+                background: theme.bg, color: theme.text, cursor: 'pointer', fontSize: '0.8rem',
+              }}>
+                {lang}
+              </button>
+              <button onClick={closeLab} style={{
+                padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.border}`,
+                background: theme.bg, color: theme.text, cursor: 'pointer', fontSize: '1rem',
+              }}>
+                &#10005;
+              </button>
+            </div>
+          </div>
+
+          {/* Lab Content */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '20px' }}>
+            {/* Zone A - Compact Periodic Table */}
+            <div style={{
+              background: theme.bgSecondary, borderRadius: '12px', padding: '16px',
+              marginBottom: '20px', border: `1px solid ${theme.border}`,
+            }}>
+              <h3 style={{ color: theme.textMuted, fontSize: '0.75rem', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {lang === 'FR' ? 'Elements disponibles' : 'Available elements'}
+              </h3>
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: '6px', justifyContent: 'center',
+              }}>
+                {elements.map((element) => {
+                  const cat = categories[element.category];
+                  return (
+                    <div
+                      key={element.id}
+                      draggable
+                      onDragStart={(e) => handleLabDragStart(e, element)}
+                      onDragEnd={() => setDraggedElement(null)}
+                      style={{
+                        width: isMobile ? '40px' : '48px', height: isMobile ? '40px' : '48px',
+                        background: cat.color, borderRadius: '6px',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'grab', transition: 'all 0.15s ease',
+                        opacity: draggedElement?.id === element.id ? 0.5 : 1,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.zIndex = '10'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.zIndex = '1'; }}
+                    >
+                      <span style={{ fontSize: isMobile ? '0.7rem' : '0.85rem', fontWeight: '700', color: '#FFF' }}>{element.symbol}</span>
+                      <span style={{ fontSize: '0.4rem', color: 'rgba(255,255,255,0.8)', maxWidth: '90%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {lang === 'FR' ? element.nameFR : element.nameEN}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Zone B - Reaction Zone */}
+            <div
+              onDragOver={handleLabDragOver}
+              onDrop={handleLabDrop}
+              style={{
+                background: theme.bgSecondary, borderRadius: '12px', padding: '24px',
+                marginBottom: '20px', border: `2px dashed ${draggedElement ? '#F97316' : theme.border}`,
+                minHeight: '120px', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                transition: 'border-color 0.2s ease',
+              }}
+            >
+              {labElements.length === 0 ? (
+                <p style={{ color: theme.textMuted, fontSize: '0.9rem' }}>{t('labDropZone')}</p>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'center' }}>
+                  {labElements.map((el, index) => {
+                    const cat = categories[el.category];
+                    return (
+                      <React.Fragment key={el.uid}>
+                        <div style={{
+                          display: 'flex', alignItems: 'center', gap: '4px',
+                          background: cat.color, borderRadius: '8px', padding: '8px 12px',
+                        }}>
+                          <span style={{ color: '#FFF', fontWeight: '700', fontSize: '0.9rem' }}>{el.symbol}</span>
+                          <button
+                            onClick={() => removeLabElement(el.uid)}
+                            style={{
+                              background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%',
+                              width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: 'pointer', color: '#FFF', fontSize: '0.7rem', marginLeft: '4px',
+                            }}
+                          >
+                            &#10005;
+                          </button>
+                        </div>
+                        {index < labElements.length - 1 && (
+                          <span style={{ color: theme.textMuted, fontSize: '1.2rem', fontWeight: '300' }}>+</span>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Zone C - Generated Formula */}
+            <div style={{
+              background: theme.bgSecondary, borderRadius: '12px', padding: '20px',
+              border: `1px solid ${theme.border}`, position: 'relative',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <h3 style={{ color: theme.textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {t('labFormula')}
+                </h3>
+                {labElements.length > 0 && (
+                  <button onClick={copyLabPrompt} style={{
+                    background: labCopied ? '#22C55E' : 'linear-gradient(135deg, #F97316, #EC4899)',
+                    border: 'none', borderRadius: '6px', padding: '6px 14px',
+                    color: '#FFF', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer',
+                  }}>
+                    {labCopied ? t('labCopied') : t('labCopy')}
+                  </button>
+                )}
+              </div>
+              <div style={{
+                background: theme.codeBg, borderRadius: '8px', padding: '16px',
+                fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem',
+                color: theme.codeText, lineHeight: 1.8, minHeight: '100px',
+                maxHeight: '300px', overflowY: 'auto', whiteSpace: 'pre-wrap',
+              }}>
+                {labElements.length === 0 ? (
+                  <span style={{ color: theme.textMuted, fontStyle: 'italic' }}>{t('labEmpty')}</span>
+                ) : (
+                  labElements.map((el, i) => (
+                    <div key={el.uid} style={{ marginBottom: i < labElements.length - 1 ? '12px' : 0 }}>
+                      <span style={{ color: categories[el.category].color, fontWeight: '600' }}>[{el.symbol}]</span>{' '}
+                      {lang === 'FR' ? el.templateFR : el.templateEN}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Lab Footer */}
+          <div style={{
+            padding: '16px 24px', borderTop: `1px solid ${theme.border}`,
+            background: theme.bgSecondary, display: 'flex', justifyContent: 'center',
+          }}>
+            <button onClick={resetLab} style={{
+              padding: '10px 24px', borderRadius: '8px',
+              border: `1px solid ${theme.border}`, background: theme.bg,
+              color: theme.textMuted, cursor: 'pointer', fontSize: '0.85rem',
+            }}>
+              {t('labReset')}
+            </button>
           </div>
         </div>
       )}
