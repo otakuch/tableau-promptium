@@ -197,7 +197,7 @@ export default function Promptium() {
   const [selectedElement, setSelectedElement] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const [copied, setCopied] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [lang, setLang] = useState('FR');
   const [isMobile, setIsMobile] = useState(false);
   // Lab states
