@@ -250,6 +250,10 @@ export default function Promptium() {
     setLabElements([]);
   };
 
+  const addLabElement = (element) => {
+    setLabElements(prev => [...prev, { ...element, uid: Date.now() + Math.random() }]);
+  };
+
   const copyLabPrompt = () => {
     const prompt = labElements.map(el => lang === 'FR' ? el.templateFR : el.templateEN).join('\n\n');
     navigator.clipboard.writeText(prompt);
@@ -862,13 +866,14 @@ export default function Promptium() {
                     <div
                       key={element.id}
                       draggable
+                      onClick={() => addLabElement(element)}
                       onDragStart={(e) => handleLabDragStart(e, element)}
                       onDragEnd={() => setDraggedElement(null)}
                       style={{
                         width: isMobile ? '40px' : '48px', height: isMobile ? '40px' : '48px',
                         background: cat.color, borderRadius: '6px',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'grab', transition: 'all 0.15s ease',
+                        cursor: 'pointer', transition: 'all 0.15s ease',
                         opacity: draggedElement?.id === element.id ? 0.5 : 1,
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.zIndex = '10'; }}
